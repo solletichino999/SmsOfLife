@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="12dp" android:saveEnabled="false">
+        <CheckBox android:id="@+id/record_checkbox" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:minHeight="48dp" android:saveEnabled="false" />
+        <TextView android:id="@+id/record_sender" style="@style/RecoveryBody" android:saveEnabled="false" />
+        <TextView android:id="@+id/record_date" style="@style/RecoveryBody" android:saveEnabled="false" />
+        <TextView android:id="@+id/record_port" style="@style/RecoveryBody" android:saveEnabled="false" />
+        <TextView android:id="@+id/record_deleted" style="@style/RecoveryBody" android:saveEnabled="false" />
+        <TextView android:id="@+id/record_indicator" style="@style/RecoveryBody" android:saveEnabled="false"
+            android:textAppearance="?attr/textAppearanceLabelLarge" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

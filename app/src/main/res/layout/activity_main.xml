@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:paddingHorizontal="20dp" android:paddingTop="16dp">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/app_name" android:textAppearance="?attr/textAppearanceHeadlineMedium" />
+        <TextView style="@style/RecoveryBody" android:text="@string/phase_label"
+            android:textAppearance="?attr/textAppearanceLabelSmall" android:layout_marginTop="4dp" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/role_banner" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical" android:paddingHorizontal="20dp"
+        android:visibility="gone" android:background="?attr/colorSecondaryContainer">
+        <TextView style="@style/RecoveryBody" android:layout_marginTop="8dp" android:text="@string/role_banner_text" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/default_settings"
+            style="@style/RecoveryButton" android:text="@string/default_settings" />
+    </LinearLayout>
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <ScrollView android:id="@+id/home_panel" android:layout_width="match_parent"
+            android:layout_height="match_parent" android:fillViewport="true">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="20dp">
+                <TextView style="@style/RecoveryBody" android:text="@string/intro_title"
+                    android:textAppearance="?attr/textAppearanceHeadlineSmall" />
+                <TextView style="@style/RecoveryBody" android:text="@string/intro_body" />
+                <TextView style="@style/RecoveryBody" android:text="@string/phase_notice" />
+                <TextView android:id="@+id/device_status" style="@style/RecoveryBody" />
+                <TextView android:id="@+id/permission_status" style="@style/RecoveryBody" />
+                <TextView android:id="@+id/role_status" style="@style/RecoveryBody" />
+                <TextView android:id="@+id/original_app" style="@style/RecoveryBody" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/scan"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:minHeight="52dp" android:text="@string/scan" />
+                <TextView style="@style/RecoveryBody" android:layout_marginTop="16dp"
+                    android:text="@string/privacy_note" android:textAppearance="?attr/textAppearanceBodySmall" />
+            </LinearLayout>
+        </ScrollView>
+        <LinearLayout android:id="@+id/results_panel" android:layout_width="match_parent"
+            android:layout_height="match_parent" android:orientation="vertical"
+            android:paddingHorizontal="16dp" android:visibility="gone">
+            <TextView style="@style/RecoveryBody" android:text="@string/results_title"
+                android:textAppearance="?attr/textAppearanceTitleLarge" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                <com.google.android.material.button.MaterialButton android:id="@+id/home"
+                    style="@style/RecoveryButton" android:layout_width="0dp" android:layout_weight="1"
+                    android:text="@string/home" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/rescan"
+                    style="@style/RecoveryButton" android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_marginStart="8dp" android:text="@string/rescan" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                <CheckBox android:id="@+id/suspicious_only" android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/suspicious_only" />
+                <Spinner android:id="@+id/sort" android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="48dp" android:contentDescription="@string/sort_label" />
+            </LinearLayout>
+            <TextView android:id="@+id/result_count" style="@style/RecoveryBody" />
+            <TextView android:id="@+id/no_matches" style="@style/RecoveryBody" android:text="@string/no_matches"
+                android:visibility="gone" />
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/records"
+                android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+                android:saveEnabled="false" />
+            <TextView android:id="@+id/selection_count" style="@style/RecoveryBody" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/request_role"
+            style="@style/RecoveryButton" android:text="@string/request_role" android:visibility="gone" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/delete_selected"
+                style="@style/RecoveryButton" android:enabled="false" android:text="@string/delete_selected" />
+        </LinearLayout>
+        <ScrollView android:id="@+id/recovery_panel" android:layout_width="match_parent"
+            android:layout_height="match_parent" android:visibility="gone" android:fillViewport="true">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="20dp">
+                <TextView style="@style/RecoveryBody" android:text="@string/recovery_title"
+                    android:textAppearance="?attr/textAppearanceHeadlineSmall" />
+                <TextView android:id="@+id/recovery_outcome" style="@style/RecoveryBody"
+                    android:accessibilityLiveRegion="polite" />
+                <TextView android:id="@+id/recovery_counts" style="@style/RecoveryBody" />
+                <TextView android:id="@+id/restore_role" style="@style/RecoveryBody" />
+                <TextView android:id="@+id/restore_original" style="@style/RecoveryBody" />
+                <TextView android:id="@+id/restore_current" style="@style/RecoveryBody" />
+                <TextView style="@style/RecoveryBody" android:text="@string/restore_instructions" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/restore_settings"
+                    style="@style/RecoveryButton" android:text="@string/restore_settings" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/check_restoration"
+                    style="@style/RecoveryButton" android:text="@string/check_restoration" />
+                <TextView android:id="@+id/restore_status" style="@style/RecoveryBody"
+                    android:accessibilityLiveRegion="polite" android:layout_marginTop="12dp" />
+                <TextView android:id="@+id/recovery_complete" style="@style/RecoveryBody"
+                    android:text="@string/recovery_complete" android:visibility="gone"
+                    android:textAppearance="?attr/textAppearanceTitleMedium" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/recovery_scan"
+                    style="@style/RecoveryButton" android:text="@string/rescan" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/recovery_home"
+                    style="@style/RecoveryButton" android:text="@string/home" />
+            </LinearLayout>
+        </ScrollView>
+    </FrameLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:paddingHorizontal="20dp" android:paddingBottom="8dp">
+        <ProgressBar android:id="@+id/progress" style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent" android:layout_height="4dp"
+            android:indeterminate="true" android:visibility="gone" />
+        <TextView android:id="@+id/scan_status" style="@style/RecoveryBody"
+            android:textAppearance="?attr/textAppearanceBodySmall" android:accessibilityLiveRegion="polite" />
+        <TextView android:id="@+id/notice" style="@style/RecoveryBody" android:visibility="gone"
+            android:textAppearance="?attr/textAppearanceBodySmall" android:accessibilityLiveRegion="polite" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/read_permission"
+            style="@style/RecoveryButton" android:text="@string/read_permission" android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton android:id="@+id/cancel_scan"
+            style="@style/RecoveryButton" android:text="@string/cancel_scan" android:visibility="gone" />
+    </LinearLayout>
+</LinearLayout>
