@@ -13,11 +13,29 @@ import static org.junit.Assert.*;
 /** UI/lifecycle checks only: no role grants and no SMS reads or writes. */
 @RunWith(AndroidJUnit4.class)
 public class RecoveryUiTest {
-    @Test public void noRoleEscalationIsOfferedWithoutADeletionSelection() {
+    @Test public void initialScreenDoesNotOfferEitherRoleRequest() {
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             scenario.onActivity(activity -> {
                 assertEquals(View.GONE, activity.findViewById(R.id.request_role).getVisibility());
+                assertEquals(View.GONE, activity.findViewById(R.id.request_read_role).getVisibility());
                 assertFalse(activity.findViewById(R.id.delete_selected).isEnabled());
+            });
+        }
+    }
+    @Test public void scanRoleRequestPurposeSurvivesActivityRecreation() {
+        try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+            scenario.onActivity(activity -> {
+                MainViewModel model = new ViewModelProvider(activity).get(MainViewModel.class);
+                model.roleRequestedForScan = true;
+            });
+            scenario.recreate();
+            scenario.onActivity(activity -> {
+                MainViewModel model = new ViewModelProvider(activity).get(MainViewModel.class);
+                assertTrue(model.roleRequestedForScan);
+                // A pending request must not start a scan or delete anything on recreation.
+                assertFalse(model.scanning());
+                assertFalse(model.recoveryRunning());
+                model.roleRequestedForScan = false;
             });
         }
     }

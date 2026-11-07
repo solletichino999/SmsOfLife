@@ -8,8 +8,8 @@ Malformed WAP Push messages left in the pending queue can be associated with rep
 
 | Item | Configuration |
 | --- | --- |
-| Supported Android versions by design | Android 14 and later, including Android 15, 16 and 17 |
-| Minimum SDK | API 34 |
+| Supported Android versions by design | Android 12 and later, including Android 13, 14, 15, 16 and 17 |
+| Minimum SDK | API 31 |
 | Target SDK | API 37 |
 | Compile SDK | API 37, minor API level 2 |
 | Application ID | `it.simonespadino.smsoflife` |
@@ -26,7 +26,8 @@ This is not an SMS/MMS client, antivirus scanner, or permanent background protec
 1. Install the APK on the device using Android's package installer. If necessary, allow installation from the particular app used to open the APK.
 2. Open **SmsOfLife** and choose **Scan device**.
 3. The app first queries `content://sms/raw` with its current access. If read access is missing, choose **Allow SMS reading**, review the explanation, and respond to Android's `READ_SMS` permission request.
-4. Review the results. Scanning does not request the default SMS role. If Android or the installer refuses read access, the app reports the problem rather than switching SMS applications to scan.
+4. Review the results. If `READ_SMS` is confirmed granted but the provider returns a **null cursor**, choose **Retry reading with temporary SMS role**. Review the incoming-message warning and approve the change in Android's role dialog. The previous SMS app is saved before that request; once the role is granted, scanning retries automatically. A null cursor does not mean an empty queue.
+5. A valid empty cursor or a successful read does not trigger this reading-role option; the role is then requested only if you select records for deletion. Missing `READ_SMS` must be resolved first. Other provider errors do not trigger the reading-role option. If reading still fails with the role held, stop and restore your previous SMS app.
 
 The query reads only `_id`, `address`, `destination_port`, `date`, and `deleted`. It does not request SMS bodies or PDUs. Queries and deletion work run outside the main UI thread.
 
@@ -75,12 +76,12 @@ The manifest contains the minimum role components: a protected `SMS_DELIVER` rec
 
 ## Restore the original SMS app and uninstall
 
-1. Open **Restore previous SMS app** or use the recovery screen shown after deletion.
+1. Open **Restore previous SMS app** in the temporary-role banner or use the recovery screen shown after deletion. The banner remains available even when the role was needed only for scanning, including empty results, scan failures, or cancellation. Restore your previous app even if you delete nothing. Pressing Back from scanning/results while the role is held also opens the restoration screen.
 2. Check the recorded previous SMS app and current default package.
 3. Choose **Restore original SMS app in Settings**. In Android's Default apps settings, select **SMS app**, then select the recorded previous application. If Android did not report an original package, select a trusted SMS application.
 4. Return to SmsOfLife. It rechecks the actual role and default package; **Check restoration** also performs this check. Opening or returning from Settings alone is not proof of restoration.
 5. The procedure is declared complete when cleanup was verified and Android confirms that SmsOfLife no longer holds the SMS role. Android does not need to disclose the replacement package, and selecting another SMS app instead of the recorded original also permits completion. The recorded previous app remains a guide for your choice in Settings.
-6. Once the completion message appears, uninstall SmsOfLife through Android's normal app-management interface.
+6. Once the completion message appears, uninstall SmsOfLife through Android's normal app-management interface. If you only scanned and performed no deletion, the restoration status still confirms release of the role; no cleanup is claimed and no deletion is required to restore your SMS app. After that confirmation, you can uninstall the tool if you have finished using it.
 
 An unavailable replacement package name does not block the positive restoration result. This result confirms release of SmsOfLife's SMS role, not the identity of the replacement app. If Android cannot report the role itself, or still identifies SmsOfLife as the default package, completion remains blocked until a fresh check confirms release. If Settings cannot be opened, navigate manually to **Settings → Apps → Default apps → SMS app**; menu names may vary.
 
@@ -121,8 +122,8 @@ The automated suite covers classification, port interpretation, filtering out de
 Validation recorded for this version:
 
 - Debug build successful.
-- 30 local Java tests passed.
-- 14 instrumented tests passed on an Android 17/API 37 emulator.
-- Lint: zero errors; one non-blocking `NotifyDataSetChanged` efficiency warning.
+- 32 local Java tests passed, including the null-cursor/permission gate for the reading-role option.
+- 15 instrumented tests passed on an Android 17/API 37 emulator, including retention of the reading-role request purpose across Activity recreation.
+- Lint: zero errors; three non-blocking warnings (`NotifyDataSetChanged` and two missing monochrome launcher icon layers).
 - Scanning with `READ_SMS` was reported working by the project owner on physical phones.
 - Deletion against a physical phone's TelephonyProvider was also reported working by the project owner. The restoration check was subsequently updated to accept a confirmed release of the SMS role even when the replacement package is unavailable; this updated feedback still requires physical-device validation. The automated results do not establish compatibility with every Android version or manufacturer.

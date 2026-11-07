@@ -49,6 +49,8 @@ public final class MainViewModel extends AndroidViewModel {
     public boolean showingResults;
     public boolean permissionAttempted;
     public boolean preparingRole;
+    // Saved by the Activity across the system role dialog; contains no SMS metadata.
+    public boolean roleRequestedForScan;
     public int notice;
     private CancellationSignal cancellation;
     private volatile boolean cleared;
@@ -75,7 +77,10 @@ public final class MainViewModel extends AndroidViewModel {
     public boolean busy() { return scanning() || preparingRole || recoveryRunning(); }
     public boolean canDelete() {
         return roles.state() == SmsRoleManager.State.HELD
-                && getApplication().checkSelfPermission(Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED;
+                && hasReadPermission();
+    }
+    public boolean hasReadPermission() {
+        return getApplication().checkSelfPermission(Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED;
     }
     public List<SmsRawRecord> openConfirmation() {
         if (busy() || confirmationOpen || !canDelete() || current().status != ScanResult.Status.SUCCESS) return null;
@@ -156,8 +161,11 @@ public final class MainViewModel extends AndroidViewModel {
         CancellationSignal signal = cancellation;
         if (signal != null) canceller.execute(signal::cancel);
     }
-    public void prepareRole() {
-        if (busy() || selection.count() == 0 || current().status != ScanResult.Status.SUCCESS) return;
+    public void prepareRole(boolean forScan) {
+        if (busy() || !hasReadPermission()) return;
+        if (forScan ? !current().canRequestReadRole(hasReadPermission())
+                : selection.count() == 0 || current().status != ScanResult.Status.SUCCESS) return;
+        roleRequestedForScan = forScan;
         preparingRole = true;
         worker.execute(() -> {
             SmsRoleManager.Preparation prepared = roles.prepareRequest();
@@ -167,6 +175,19 @@ public final class MainViewModel extends AndroidViewModel {
                 preparation.setValue(prepared);
             });
         });
+    }
+    public void onRoleRequestResult() {
+        boolean retryScan = roleRequestedForScan;
+        roleRequestedForScan = false;
+        if (roles.state() != SmsRoleManager.State.HELD) {
+            notice = R.string.role_declined;
+        } else if (retryScan) {
+            // Retry only reading, and only after a real grant with READ_SMS still present.
+            if (hasReadPermission()) scan();
+            else notice = R.string.permission_denied;
+        } else {
+            notice = R.string.role_granted_for_deletion;
+        }
     }
     public void consumePreparation() { preparation.setValue(null); }
     @Override protected void onCleared() {

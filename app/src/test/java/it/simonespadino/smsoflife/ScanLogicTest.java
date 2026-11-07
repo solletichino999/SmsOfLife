@@ -88,7 +88,21 @@ public class ScanLogicTest {
         assertEquals(ScanResult.Status.EMPTY, ScanResult.rows(Collections.emptyList(), true).status);
         assertTrue(ScanResult.state(ScanResult.Status.ACCESS_DENIED).needsAccess());
         assertFalse(ScanResult.state(ScanResult.Status.UNSUPPORTED).needsAccess());
-        assertFalse(ScanResult.state(ScanResult.Status.NULL_CURSOR).needsAccess());
+        assertTrue(ScanResult.state(ScanResult.Status.NULL_CURSOR).needsAccess());
+    }
+    @Test public void readingRoleIsOfferedOnlyForNullCursorWithReadPermission() {
+        for (ScanResult.Status status : ScanResult.Status.values()) {
+            ScanResult result = ScanResult.state(status);
+            assertFalse(status.name(), result.canRequestReadRole(false));
+            assertEquals(status.name(), status == ScanResult.Status.NULL_CURSOR,
+                    result.canRequestReadRole(true));
+        }
+    }
+    @Test public void validEmptyQueueAndActualRowsNeverNeedReadingRole() {
+        assertFalse(ScanResult.rows(Collections.emptyList(), true).canRequestReadRole(true));
+        assertFalse(ScanResult.rows(Collections.emptyList(), false).canRequestReadRole(true));
+        assertFalse(ScanResult.rows(Collections.singletonList(row(1, 134020L, 1L, 0)), true)
+                .canRequestReadRole(true));
     }
     @Test public void actualRowsDoNotTriggerUnnecessaryPermissionEscalation() {
         ScanResult result = ScanResult.rows(Collections.singletonList(row(1, 80L, 1L, 0)), false);

@@ -31,6 +31,11 @@ public final class ScanResult {
         return new ScanResult(Status.MISSING_COLUMNS, Collections.emptyList(), columns);
     }
     public boolean needsAccess() {
-        return status == Status.ACCESS_DENIED || status == Status.EMPTY_UNVERIFIED;
+        return status == Status.ACCESS_DENIED || status == Status.EMPTY_UNVERIFIED
+                || status == Status.NULL_CURSOR;
+    }
+    /** A null cursor is not an empty queue. Escalation for reading requires READ_SMS first. */
+    public boolean canRequestReadRole(boolean readPermissionGranted) {
+        return status == Status.NULL_CURSOR && readPermissionGranted;
     }
 }

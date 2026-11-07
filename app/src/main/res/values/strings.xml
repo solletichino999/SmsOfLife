@@ -4,7 +4,7 @@
     <string name="phase_label">TEMPORARY DEVICE RECOVERY</string>
     <string name="intro_title">Inspect the pending SMS queue</string>
     <string name="intro_body">Malformed WAP Push messages left in the Android SMS queue may be associated with repeated phone-service crashes. Inspect queue metadata without opening message contents.</string>
-    <string name="phase_notice">Scanning uses SMS read access. Deleting selected records requires the temporary SMS role and a separate confirmation. Removing problematic messages does not fix an Android vulnerability.</string>
+    <string name="phase_notice">Scanning uses SMS read access. Some devices also require the temporary SMS role to return a cursor. Deleting selected records requires the role and a separate confirmation. Removing problematic messages does not fix an Android vulnerability.</string>
     <string name="privacy_note">Offline • No telemetry • No message contents or PDUs read • Results kept only in memory</string>
     <string name="device_status">Android %1$s · API %2$d</string>
     <string name="permission_granted">READ_SMS: granted</string>
@@ -24,11 +24,13 @@
     <string name="continue_label">Continue</string>
     <string name="read_permission">Allow SMS reading</string>
     <string name="request_role">Enable deletion with temporary SMS role</string>
+    <string name="request_read_role">Retry reading with temporary SMS role</string>
     <string name="permission_title">SMS read access</string>
     <string name="permission_explanation">The first query could not establish read access. Android may allow READ_SMS after your approval, but the installer can restrict this permission. The app only queries pending-message metadata; it does not read SMS bodies.</string>
-    <string name="permission_denied">READ_SMS was not granted. It may have been declined or restricted by the installer. Reading the queue requires access; scanning will not request the default SMS role.</string>
+    <string name="permission_denied">READ_SMS was not granted. It may have been declined or restricted by the installer. Grant SMS read access before requesting a temporary SMS role for reading.</string>
     <string name="role_title">Temporarily replace your SMS app?</string>
     <string name="role_warning">SmsOfLife is not an SMS/MMS client. While it is the default, incoming SMS/MMS are not saved by this app and may be lost or not received correctly. Sending and quick replies are unavailable.\n\nThe role is requested only to delete records you selected. It does not guarantee write access. Nothing will be deleted until you review the IDs and confirm separately after returning here.\n\nYour current SMS app will be recorded before Android asks for approval. Keep this period brief, then restore that app in Default apps. Uninstalling does not guarantee restoration.</string>
+    <string name="read_role_warning">READ_SMS is granted, but the provider returned a null cursor. This is not an empty queue. This device may also require SmsOfLife to be the default SMS app to read the queue.\n\nSmsOfLife is not an SMS/MMS client. While it is the default, incoming SMS/MMS are not saved by this app and may be lost or not received correctly. Sending and quick replies are unavailable.\n\nYour current SMS app will be recorded before Android asks for approval. If the role is granted, scanning will retry. Access is not guaranteed and nothing will be deleted automatically. Restore your previous SMS app after scanning, even if you delete nothing or reading still fails. Uninstalling does not guarantee restoration.</string>
     <string name="role_banner_text">Temporary SMS role active. Incoming SMS/MMS may be lost. Restore your previous SMS app as soon as possible.</string>
     <string name="default_settings">Restore previous SMS app</string>
     <string name="role_declined">The temporary SMS role was not granted. The app has not changed the default itself.</string>

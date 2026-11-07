@@ -50,11 +50,8 @@ public final class MainActivity extends AppCompatActivity {
     private final ActivityResultLauncher<Intent> roleRequest = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
                 // A result code alone does not establish that the role is held.
-                if (model.roles.state() == SmsRoleManager.State.HELD) {
-                    model.notice = R.string.role_granted_for_deletion;
-                    render();
-                }
-                else { model.notice = R.string.role_declined; render(); }
+                model.onRoleRequestResult();
+                render();
             });
 
     @Override protected void onCreate(Bundle state) {
@@ -68,7 +65,10 @@ public final class MainActivity extends AppCompatActivity {
             return insets;
         });
         model = new ViewModelProvider(this).get(MainViewModel.class);
-        if (state != null) model.permissionAttempted |= state.getBoolean("permission_attempted");
+        if (state != null) {
+            model.permissionAttempted |= state.getBoolean("permission_attempted");
+            model.roleRequestedForScan |= state.getBoolean("scan_role_request");
+        }
         adapter = new SmsRecordAdapter(model.selection, this::renderSelection);
         RecyclerView list = findViewById(R.id.records);
         list.setLayoutManager(new LinearLayoutManager(this));
@@ -88,7 +88,8 @@ public final class MainActivity extends AppCompatActivity {
             model.showingRecovery = false; model.showingResults = false; render();
         });
         findViewById(R.id.read_permission).setOnClickListener(v -> explainPermission());
-        findViewById(R.id.request_role).setOnClickListener(v -> explainRole());
+        findViewById(R.id.request_role).setOnClickListener(v -> explainRole(false));
+        findViewById(R.id.request_read_role).setOnClickListener(v -> explainRole(true));
         findViewById(R.id.default_settings).setOnClickListener(v -> { model.showingRecovery = true; render(); });
         CheckBox filter = findViewById(R.id.suspicious_only);
         filter.setChecked(model.suspiciousOnly);
@@ -127,11 +128,13 @@ public final class MainActivity extends AppCompatActivity {
             if (prepared == SmsRoleManager.Preparation.READY) {
                 try { roleRequest.launch(model.roles.requestIntent()); }
                 catch (ActivityNotFoundException | SecurityException | IllegalArgumentException e) {
+                    model.roleRequestedForScan = false;
                     model.notice = R.string.role_request_failed;
                 }
             } else if (prepared == SmsRoleManager.Preparation.ALREADY_HELD) {
-                model.notice = R.string.role_granted_for_deletion;
+                model.onRoleRequestResult();
             } else {
+                model.roleRequestedForScan = false;
                 model.notice = prepared == SmsRoleManager.Preparation.SAVE_FAILED
                         ? R.string.role_save_failed : R.string.role_request_failed;
             }
@@ -141,6 +144,7 @@ public final class MainActivity extends AppCompatActivity {
     @Override protected void onResume() { super.onResume(); if (model != null) render(); }
     @Override protected void onSaveInstanceState(Bundle state) {
         state.putBoolean("permission_attempted", model.permissionAttempted);
+        state.putBoolean("scan_role_request", model.roleRequestedForScan);
         super.onSaveInstanceState(state);
     }
     @Override protected void onDestroy() {
@@ -181,10 +185,11 @@ public final class MainActivity extends AppCompatActivity {
                     permissionRequest.launch(Manifest.permission.READ_SMS);
                 }).show();
     }
-    private void explainRole() {
+    private void explainRole(boolean forScan) {
         new MaterialAlertDialogBuilder(this).setTitle(R.string.role_title)
-                .setMessage(R.string.role_warning).setNegativeButton(R.string.cancel, null)
-                .setPositiveButton(R.string.continue_label, (dialog, which) -> { model.prepareRole(); render(); })
+                .setMessage(forScan ? R.string.read_role_warning : R.string.role_warning)
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.continue_label, (dialog, which) -> { model.prepareRole(forScan); render(); })
                 .show();
     }
     private void openDefaultSettings() {
@@ -218,6 +223,9 @@ public final class MainActivity extends AppCompatActivity {
         findViewById(R.id.rescan).setEnabled(!busy);
         boolean accessNeeded = result.needsAccess() && !busy;
         visible(R.id.read_permission, accessNeeded && !hasReadPermission());
+        visible(R.id.request_read_role, !model.showingRecovery
+                && result.canRequestReadRole(hasReadPermission()) && role == SmsRoleManager.State.AVAILABLE);
+        findViewById(R.id.request_read_role).setEnabled(!busy);
         findViewById(R.id.home).setEnabled(!busy);
         findViewById(R.id.default_settings).setEnabled(!busy);
         findViewById(R.id.restore_settings).setEnabled(!busy);
